@@ -14,7 +14,7 @@ def preprocess_index_QFQ(cursor, pro, ts_symbol='000001', market='SH' ):
     #获取交易的指数代码
     ts_code = ts_symbol + '.' + market
     # check download data in mysql database
-    sql_dabase = 'use ts_stock;'
+    sql_dabase = 'use stock_data;'
     cursor.execute(sql_dabase)
 
     # ------- 利润表： 创建表格---------
@@ -147,16 +147,16 @@ if __name__ == '__main__':
     # ===============建立数据库连接,剔除已入库的部分============================
     # connect database
     config = {
-        'host': 'localhost',
+        'host': 'mysqldb',
         'user': 'root',
-        'password': '123456',
-        'database': 'ts_stock',
+        'password': 'mysqldb',
+        'database': 'stock_data',
         'charset': 'utf8'
     }
     db = pymysql.connect( **config )
 
     # -----------设置tushare pro的token并获取连接---------------
-    token = 'xxxx'
+    token = 'b63c9d346f1023b4e99b23cb32354785f3cd26ad9e0b6c396a0faa2d'
     pro = ts.pro_api( token )
 
     #上证综指代码：000001.SH,

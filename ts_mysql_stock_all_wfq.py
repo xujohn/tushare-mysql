@@ -17,7 +17,7 @@ import pandas as pd
 
 def preprocess_stock_WFQ(cursor, pro, sqlTable='stock_all_wfq' ):
     # check download data in mysql database
-    sql_dabase = 'use ts_stock;'
+    sql_dabase = 'use stock_data;'
     cursor.execute(sql_dabase)
 
     # ------- 创建表格---------

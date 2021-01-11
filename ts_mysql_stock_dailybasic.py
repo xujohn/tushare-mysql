@@ -16,7 +16,7 @@ import numpy as np
 
 def preprocess_stock_dailybasic(cursor, pro ):
     # check download data in mysql database
-    sql_dabase = 'use ts_stock;'
+    sql_dabase = 'use stock_data;'
     cursor.execute(sql_dabase)
 
     # -------创建表格---------
@@ -129,6 +129,7 @@ def run_stock_dailybasic( db, pro, first_update_flag=False ):
             mysql_stock_dailybasic(db, cursor, pro, itx, stock_pool, start_dt, end_dt, sql_insert, sql_value)
             # ======update index=========
             itx += 1
+            time.sleep(0.2);
     else:
         itx = 0
         itx_org = itx
@@ -159,16 +160,16 @@ if __name__ == '__main__':
     # ===============建立数据库连接,剔除已入库的部分============================
     # connect database
     config = {
-        'host': 'localhost',
+        'host': 'mysqldb',
         'user': 'root',
-        'password': '123456',
-        'database': 'ts_stock',
+        'password': 'mysqldb',
+        'database': 'stock_data',
         'charset': 'utf8'
     }
     db = pymysql.connect( **config )
 
     # -----------设置tushare pro的token并获取连接---------------
-    token = 'xxxx'
+    token = 'b63c9d346f1023b4e99b23cb32354785f3cd26ad9e0b6c396a0faa2d'
     pro = ts.pro_api( token )
 
     #如何第一次使用这个程序，那么需要下载所有的数据：

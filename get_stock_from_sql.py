@@ -20,13 +20,14 @@ EPSILON = sys.float_info.epsilon
 # ======================建立数据库连接,剔除已入库的部分==============================
 # connect database
 config = {
-    'host': 'localhost',
+    'host': 'mysqldb',
     'user': 'root',
-    'password': '123456',
-    'database': 'ts_stock',
+    'password': 'mysqldb',
+    'database': 'stock_data',
     'charset': 'utf8'
 }
 db = pymysql.connect(**config)
+
 # ------create an object cursor: 模块主要的作用就是用来和数据库交互的--------------
 cursor = db.cursor()
 

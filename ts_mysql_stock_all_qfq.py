@@ -14,13 +14,14 @@ import tushare as ts
 import pymysql
 import datetime
 import time
+import sys
 import numpy as np
 import pandas as pd 
 
 
 def preprocess_stockQFQ(cursor, pro ):
     # check download data in mysql database
-    sql_dabase = 'use ts_stock;'
+    sql_dabase = 'use stock_data;'
     cursor.execute(sql_dabase)
 
     # -------创建表格---------
@@ -44,11 +45,12 @@ def preprocess_stockQFQ(cursor, pro ):
             sql_insert += col + ', '
             sql_value += "'%s', "
             str_index.append(ctx)
-
         elif isinstance( df[col].iloc[0], float  ):
             sql_comm += col + " decimal(20, 2), "
             sql_insert += col + ', '
             sql_value += "'%.2f', "
+        else:
+            print("Unknown type " + df[col].iloc[0]);
     #
     sql_comm = sql_comm[0: len(sql_comm) - 2]
     sql_comm += ") engine=innodb default charset=utf8mb4;"
@@ -57,6 +59,7 @@ def preprocess_stockQFQ(cursor, pro ):
     sql_insert += " )"
     sql_value = sql_value[0: len(sql_value) - 2]
     sql_value += " )"
+
     #
     cursor.execute(sql_comm)
 
@@ -233,7 +236,7 @@ def run_stockQFQ_batch( db, pro, first_update_flag=False ):
     data = pro.stock_basic(exchange='', list_status='L' )
     # 设定需要获取数据的股票池
     stock_pool = data['ts_code'].tolist()
-    #print( stock_pool.index( '002427.SZ') )
+    print(stock_pool.index('002427.SZ'))
 
     # ----- create an object cursor: 模块主要的作用就是用来和数据库交互的
     cursor = db.cursor()
@@ -247,6 +250,7 @@ def run_stockQFQ_batch( db, pro, first_update_flag=False ):
             mysql_stockQFQ(db, cursor, pro, itx, stock_pool, start_dt, end_dt, sql_insert, sql_value)
             # ======update index=========
             itx += 1
+            time.sleep(0.3)
     else:
         btx = 0
         batch_size = 100
@@ -259,6 +263,7 @@ def run_stockQFQ_batch( db, pro, first_update_flag=False ):
             print('btx = ', btx, ', batch_codes: ', batch_codes )
             #
             mysql_stockQFQ_batch(db, cursor, pro, batch_codes, start_dt, end_dt, sql_insert, sql_value)
+            time.sleep(0.3)
 
             #======update index=========
             btx += 1
@@ -275,16 +280,16 @@ if __name__ == '__main__':
     # ===============建立数据库连接,剔除已入库的部分============================
     # connect database
     config = {
-        'host': 'localhost',
+        'host': 'mysqldb',
         'user': 'root',
-        'password': '123456',
-        'database': 'ts_stock',
+        'password': 'mysqldb',
+        'database': 'stock_data',
         'charset': 'utf8'
     }
     db = pymysql.connect( **config )
 
     # -----------设置tushare pro的token并获取连接---------------
-    token = 'xxxx'
+    token = 'b63c9d346f1023b4e99b23cb32354785f3cd26ad9e0b6c396a0faa2d'
     pro = ts.pro_api( token )
 
     #如何第一次使用这个程序，那么需要下载所有的数据：
@@ -297,4 +302,4 @@ if __name__ == '__main__':
     #modified by mumu-2014 on Dec. 3, 2019:
     # 使用batch_code 每次读取100只股票信息而不是每次读取一只股票
     # 然后再按照原来的方法入库
-    run_stockQFQ_batch(db, pro, first_update_flag=True)
+    run_stockQFQ_batch(db, pro, first_update_flag=False)
